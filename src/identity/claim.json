@@ -1,0 +1,26 @@
+{
+    "101010003000021":{
+        "id": 101010003000021,
+        "name": "COUNTRY",
+        "description": "Country ISO-2 in clear.",
+        "scheme": {
+          "name": "STRING"
+        }
+      },
+      "10101000100001": {
+        "id": 10101000100001,
+        "name": "BASIC_IDENTITY",
+        "description": "Combination of name, gender and birth date, hashed.",
+        "scheme": {
+          "name": "STRING"
+        }
+      },
+      "10101000100002": {
+        "id": 10101000100002,
+        "name": "CONTACT_ADDRESS",
+        "description": "Combination of residence, email, phone, hashed.",
+        "scheme": {
+          "name": "STRING"
+        }
+      }
+}

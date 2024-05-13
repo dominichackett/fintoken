@@ -48,6 +48,11 @@ module.exports ={
       "green-600": "#16a34a",
       "red-500": "#ef4444",
       "blue-500":"#3b82f6",
+      'blue-dark': '#0A2540', // Dark blue background color
+      'blue-medium': '#1C4B75', // Medium blue color for circular lines
+      'blue-light': '#3E92CC', // Light blue highlights on text and icons
+      'green-light': '#32CD32', // Green color for globe continents
+      'gold': '#FFD700', // Gold color for circular lines surrounding the globe
       gradient: 'linear-gradient(158.44deg, #EBC77A 7.17%, #CA3F8D 52.72%, #5142FC 91.26%)',
     },
     screens: {

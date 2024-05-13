@@ -3,9 +3,153 @@ import Head from 'next/head'
 import Header from '@/components/Header/Header'
 import Footer from '@/components/Footer/Footer'
 import Image from 'next/image';
-
+import { createIdentity,getIdentity ,allowKYCClaim,approveKYC,getClaims,validateClaim,registerIdentity
+  ,addAgent,isVerified,getTopics,addTrustedIssuer} from '@/identity/identity';
 import Link from 'next/link'
+import { useEthersSigner } from '@/signer/signer'
+
 export default function Home() {
+  const signer = useEthersSigner()
+const _createIdentity = async()=>{
+   //console.log(signer?.)
+   try {
+
+       console.log(signer?.provider)  
+       console.log(signer?.getAddress())
+       await createIdentity(signer)
+
+   }catch(error:any){
+     console.log(error)
+   }
+}
+
+const _getIdentity = async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+      console.log( await getIdentity(signer,await signer?.getAddress()))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+const _KYC = async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+      console.log( await allowKYCClaim(signer))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+const _approveKYC = async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+      console.log( await approveKYC(signer,"TT",101010003000021))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+const _getClaims = async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+     // console.log( await getClaims(signer,101010003000021))
+      console.log( await validateClaim(signer,"TT",101010003000021))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+
+
+const _registerIdentity= async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+     // console.log( await getClaims(signer,101010003000021))
+      console.log( await registerIdentity(signer,await signer.getAddress()))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+
+const _addAgent= async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+     // console.log( await getClaims(signer,101010003000021))
+      console.log( await addAgent(signer,await signer.getAddress()))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+const _isVerified= async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+     // console.log( await getClaims(signer,101010003000021))
+      console.log( await isVerified(signer,await signer.getAddress()))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+
+const _getTopics= async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+     // console.log( await getClaims(signer,101010003000021))
+      console.log( await getTopics(signer))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+const _addTrustedIssuer= async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+     // console.log( await getClaims(signer,101010003000021))
+      console.log( await addTrustedIssuer(signer))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
   return (
     <>
       <Head>
@@ -62,16 +206,67 @@ FinToken is a pioneering platform empowering banks and asset managers to tokeniz
          <div className="flex flex-wrap items-center">
                 <Link
                   href="/institutions"
-                  className="mr-5 mb-5 inline-flex items-center justify-center rounded-md border-2 border-primary bg-primary py-3 px-7 text-base font-semibold text-white transition-all hover:bg-opacity-90"
+                  className="mr-5 mb-5 inline-flex items-center justify-center rounded-md border-2 border-gold bg-gold py-3 px-7 text-base font-semibold text-white transition-all hover:bg-opacity-90"
                 >
                   Institutions
                 </Link>
                 <Link
                   href="/individuals"
-                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-primary hover:bg-primary"
+                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
                 >
                   Investors
                 </Link>
+                <button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_createIdentity}>Identity</button>
+                                <button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_getIdentity}>Get Identity</button>
+
+
+
+                                <button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_KYC}>KYC</button>
+
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_approveKYC}>Approve KYC</button>
+
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_getClaims}>Claims</button>
+
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_addAgent}>Add Agent</button>            
+
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_registerIdentity}>Register ID</button>
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_isVerified}>Is Verified</button>
+
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_getTopics}>Get Claim Topics</button>
+
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_addTrustedIssuer}>Trusted Issuer</button>
+
+
               </div>
             </div>
           </div>
