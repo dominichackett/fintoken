@@ -86,22 +86,90 @@ import Link from 'next/link';
                         </li>
                            <li className="group relative">
                           <Link
-                            href="/timeshares"
+                            href="/bridge"
                             className="mx-8 flex py-2 text-base font-semibold text-[#bababa] group-hover:text-white lg:mr-0 lg:ml-8 lg:inline-flex lg:py-6 lg:px-0 xl:ml-12"
                           >
-                           Timeshares
+                           Bridge
                           </Link>
                         </li>
 
-                       
-      
+                        { isConnected  &&<li className="group submenu-item relative">
+                          <Link
+                            href="javascript:void(0)"
+                            onClick={()=> setSubmenuOpen(!submenuOpen)}
+                            className="relative mx-8 flex py-2 text-base font-semibold text-[#bababa] after:absolute after:right-1 after:top-1/2 after:mt-[-2px] after:h-2 after:w-2 after:translate-y-[-50%] after:rotate-45 after:border-b-2 after:border-r-2 after:border-current group-hover:text-white lg:mr-0 lg:ml-8 lg:inline-flex lg:py-6 lg:pl-0 lg:pr-4 lg:after:right-0 xl:ml-12"
+                          >
+                            Admin
+                          </Link>
+                          <div
+                            className={`${submenuOpen ? 'block' : 'hidden'} submenu relative top-full left-0 w-[250px] rounded-md bg-dark p-4 transition-[top] duration-300 group-hover:opacity-100 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full `}
+                            
+                          >
+                             <Link
+                              href="/profile"
+                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
+                            >
+                              Investor Management
+                            </Link>
+                            <Link
+                              href="/profile"
+                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
+                            >
+                              Agents
+                            </Link>
+
+                            <Link
+                              href="/profile"
+                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
+                            >
+                              Token Issuers
+                            </Link>
+                          
+                          </div>
+                          
+                        </li>}
+                        { isConnected  &&<li className="group submenu-item relative">
+                          <Link
+                            href="javascript:void(0)"
+                            onClick={()=> setSubmenuOpen(!submenuOpen)}
+                            className="relative mx-8 flex py-2 text-base font-semibold text-[#bababa] after:absolute after:right-1 after:top-1/2 after:mt-[-2px] after:h-2 after:w-2 after:translate-y-[-50%] after:rotate-45 after:border-b-2 after:border-r-2 after:border-current group-hover:text-white lg:mr-0 lg:ml-8 lg:inline-flex lg:py-6 lg:pl-0 lg:pr-4 lg:after:right-0 xl:ml-12"
+                          >
+                            Asset Managers
+                          </Link>
+                          <div
+                            className={`${submenuOpen ? 'block' : 'hidden'} submenu relative top-full left-0 w-[250px] rounded-md bg-dark p-4 transition-[top] duration-300 group-hover:opacity-100 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full `}
+                            
+                          >
+                             <Link
+                              href="/profile"
+                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
+                            >
+                              Token Management
+                            </Link>
+                            <Link
+                              href="/profile"
+                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
+                            >
+                              Agents
+                            </Link>
+
+                            <Link
+                              href="/profile"
+                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
+                            >
+                              Client Management
+                            </Link>
+                          
+                          </div>
+                          
+                        </li>}
                        { isConnected  &&<li className="group submenu-item relative">
                           <Link
                             href="javascript:void(0)"
                             onClick={()=> setSubmenuOpen(!submenuOpen)}
                             className="relative mx-8 flex py-2 text-base font-semibold text-[#bababa] after:absolute after:right-1 after:top-1/2 after:mt-[-2px] after:h-2 after:w-2 after:translate-y-[-50%] after:rotate-45 after:border-b-2 after:border-r-2 after:border-current group-hover:text-white lg:mr-0 lg:ml-8 lg:inline-flex lg:py-6 lg:pl-0 lg:pr-4 lg:after:right-0 xl:ml-12"
                           >
-                            Account
+                            Investors
                           </Link>
                           <div
                             className={`${submenuOpen ? 'block' : 'hidden'} submenu relative top-full left-0 w-[250px] rounded-md bg-dark p-4 transition-[top] duration-300 group-hover:opacity-100 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full `}
@@ -114,26 +182,7 @@ import Link from 'next/link';
                               Profile
                             </Link>
                           
-                            <Link
-                              href="/mytimeshares"
-                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
-                            >
-                              My Time Shares
-                            </Link>
-
-                            <Link
-                              href="/purchased"
-                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
-                            >
-                              Purchased Time Shares
-                            </Link>
-
-                            <Link
-                              href="/verifyprofile"
-                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
-                            >
-                              Verify Profile
-                            </Link>
+                           
                           </div>
                           
                         </li>}

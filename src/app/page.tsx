@@ -4,7 +4,7 @@ import Header from '@/components/Header/Header'
 import Footer from '@/components/Footer/Footer'
 import Image from 'next/image';
 import { createIdentity,getIdentity ,allowKYCClaim,approveKYC,getClaims,validateClaim,registerIdentity
-  ,addAgent,isVerified,getTopics,addTrustedIssuer} from '@/identity/identity';
+  ,addAgent,isVerified,getTopics,addTrustedIssuer,addClaimIssuerKey} from '@/identity/identity';
 import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
 
@@ -29,7 +29,7 @@ const _getIdentity = async()=>{
 
       //console.log(signer?.provider)  
       //console.log(signer?.getAddress())
-      console.log( await getIdentity(signer,await signer?.getAddress()))
+      console.log( await getIdentity(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26"))
 
   }catch(error:any){
     console.log(error)
@@ -55,7 +55,7 @@ const _approveKYC = async()=>{
 
       //console.log(signer?.provider)  
       //console.log(signer?.getAddress())
-      console.log( await approveKYC(signer,"TT",101010003000021))
+      console.log( await approveKYC(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26"))
 
   }catch(error:any){
     console.log(error)
@@ -68,8 +68,8 @@ const _getClaims = async()=>{
 
       //console.log(signer?.provider)  
       //console.log(signer?.getAddress())
-     // console.log( await getClaims(signer,101010003000021))
-      console.log( await validateClaim(signer,"TT",101010003000021))
+      console.log( await getClaims(signer,1))
+   //   console.log( await validateClaim(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26"))
 
   }catch(error:any){
     console.log(error)
@@ -85,7 +85,7 @@ const _registerIdentity= async()=>{
       //console.log(signer?.provider)  
       //console.log(signer?.getAddress())
      // console.log( await getClaims(signer,101010003000021))
-      console.log( await registerIdentity(signer,await signer.getAddress()))
+      console.log( await registerIdentity(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26"))
 
   }catch(error:any){
     console.log(error)
@@ -114,7 +114,7 @@ const _isVerified= async()=>{
       //console.log(signer?.provider)  
       //console.log(signer?.getAddress())
      // console.log( await getClaims(signer,101010003000021))
-      console.log( await isVerified(signer,await signer.getAddress()))
+      console.log( await isVerified(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26"))
 
   }catch(error:any){
     console.log(error)
@@ -144,6 +144,21 @@ const _addTrustedIssuer= async()=>{
       //console.log(signer?.getAddress())
      // console.log( await getClaims(signer,101010003000021))
       console.log( await addTrustedIssuer(signer))
+
+  }catch(error:any){
+    console.log(error)
+  }
+}
+
+
+const _addClaimsIssuerKey= async()=>{
+  //console.log(signer?.)
+  try {
+
+      //console.log(signer?.provider)  
+      //console.log(signer?.getAddress())
+     // console.log( await getClaims(signer,101010003000021))
+      console.log( await addClaimIssuerKey(signer))
 
   }catch(error:any){
     console.log(error)
@@ -211,7 +226,7 @@ FinToken is a pioneering platform empowering banks and asset managers to tokeniz
                   Institutions
                 </Link>
                 <Link
-                  href="/individuals"
+                  href="/investorsignup"
                   className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
                 >
                   Investors
@@ -265,6 +280,11 @@ FinToken is a pioneering platform empowering banks and asset managers to tokeniz
                                   className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
 
                 onClick={_addTrustedIssuer}>Trusted Issuer</button>
+
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_addClaimsIssuerKey}>Add Claims Issuer Key</button>
 
 
               </div>

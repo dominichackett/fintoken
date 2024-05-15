@@ -44,81 +44,58 @@ export const allowKYCClaim = async(signer:any)=>{
   console.log(ethers.utils.keccak256(
     ethers.utils.defaultAbiCoder.encode(['address'], [claimsIssuer])))
   console.log(IdentitySDK.utils.encodeAndHash(['address'], [claimsIssuer]))
-  const addKeyTransaction = await identity.addKey(IdentitySDK.utils.encodeAndHash(['address'], [claimsIssuer]), IdentitySDK.utils.enums.KeyPurpose.CLAIM, IdentitySDK.utils.enums.KeyType.ECDSA,{signer});
+  const addKeyTransaction = await identity.addKey(IdentitySDK.utils.encodeAndHash(['address'], [await _signer.getAddress()]), IdentitySDK.utils.enums.KeyPurpose.CLAIM, IdentitySDK.utils.enums.KeyType.ECDSA,{signer});
  // return addKeyTransaction;
  
 }
 
-export const approveKYC = async(signer:any,data:string,topic:number)=>{
+export const approveKYC = async(signer:any,address:string)=>{
    
-  const id = await getIdentity(signer,await signer.getAddress());
+  const id = await getIdentity(signer,address);
  
-  // prepare the claim
-   /* const claim = new IdentitySDK.Claim({
-        address: id,
-        data: ethers.utils.sha256(ethers.utils.toUtf8Bytes(data)),
-        issuer: claimsIssuer,
-        emissionDate: Date.now(),
-        scheme: ethers.utils.sha256(ethers.utils.toUtf8Bytes(JSON.stringify(claimJSON[topic]))),
-        topic: topic,
-        uri:"http://www.eventslive101.com"
-    });
-    console.log(claim)
+  console.log(id)
+  const topic =1;
+  const scheme =1;
+  let cdata =   ethers.utils.hexlify(ethers.utils.toUtf8Bytes('KYC'))
 
-     // sign the claim
-     const customSigner = new IdentitySDK.SignerModule({
-      publicKey: await _signer.getAddress(),
-      signMessage: _signer.signMessage.bind(_signer)
-  });
-  await claim.sign(customSigner);
-  console.log(id)*/
-  //const identity = new IdentitySDK.Identity(id,_signer); // Create the Identity Object
-  //console.log(await identity.getKey(   ethers.utils.keccak256( ethers.utils.defaultAbiCoder.encode(['address'], [claimsIssuer]))))
-  //console.log(await identity.getKey(  ethers.utils.keccak256( ethers.utils.defaultAbiCoder.encode(['address'], [await _signer.getAddress()]))))
-
-console.log("Free")
-  // emit the claim
-
-  //console.log(OnChainId.contracts.ClaimIssuer.abi)
-  const issuer = new ethers.Contract(claimsIssuer,OnChainId.contracts.ClaimIssuer.abi,_signer)
-  console.log("Free")
-
-  const cdata = ethers.utils.sha256(ethers.utils.toUtf8Bytes(data))
-  console.log("Free")
-
-  const scheme=ethers.utils.sha256(ethers.utils.toUtf8Bytes(JSON.stringify(claimJSON[topic])))
-  console.log("Free")
-
-  const topicBytes32 = ethers.utils.formatBytes32String(topic.toString());
-
-
-  const signature = _signer.signMessage(ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(['address', 'uint256', 'bytes'], [id, topic, cdata])));
-
-
-
-   //const tx = await identity.addClaim(topic, claim.scheme, claimsIssuer, claim.signature, claim.data, claim.uri, { _signer });
-  //const tx = await identity.addClaim(claim.topic, claim.scheme, claim.issuer, claim.signature, claim.data, claim.uri, { _signer });
-  const tx = await issuer.addClaim(topic, scheme, claimsIssuer, signature, cdata, "http://www.eventslive101.com",{gasLimit:3000000});
   
-  await tx.wait();
-}
+ 
+  const signature = await _signer.signMessage(
+    ethers.utils.arrayify(
+      ethers.utils.keccak256(
+        ethers.utils.defaultAbiCoder.encode(['address', 'uint256', 'bytes'], [id, topic, cdata]),
+      )));
+
+  const identity = new IdentitySDK.Identity(id,_signer); // Create the Identity Object
+  const tx = await identity.addClaim(topic, scheme, claimsIssuer, signature, cdata, "http://www.eventslive101.com");
+  
+ }
 
 
 export const getClaims = async(signer:any,topic:number)=>{
 
-  const id = await getIdentity(signer,await signer.getAddress());
+  const id = await getIdentity(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26");
+  console.log(id)
   const identity = new IdentitySDK.Identity(id,signer); // Create the Identity Object
    console.log(await identity.getKeysByPurpose(IdentitySDK.utils.enums.KeyPurpose.CLAIM) )
-   console.log(await identity.getClaimIdsByTopic(101010003000021))
+    const claims = await identity.getClaimsByTopic(1)
+    console.log(claims)
    console.log(OnChainId.contracts.ClaimIssuer)
-
+   
   const issuer = new ethers.Contract(claimsIssuer,OnChainId.contracts.ClaimIssuer.abi,_signer)
-  console.log(await issuer.getKey(await _signer.getAddress() ))
+  const x = await issuer.isClaimValid(id,1,claims[0].signature,claims[0].data)
+  console.log(x)
+ // console.log(await issuer.getKey(await _signer.getAddress() ))
    // 
 }
 
-export const validateClaim = async(signer:any,data:string,topic:number)=>{
-  const id = await getIdentity(signer,await signer.getAddress());
+export const validateClaim = async(signer:any,address:string)=>{
+  const id = await getIdentity(signer,address);
+
+  const ctRegistry = new ethers.Contract(trustedIssuersRegistry,trustedIssuersRegistryABI,signer)
+  const topics = await ctRegistry.getTrustedIssuersForClaimTopic(1);
+  console.log(topics)
+  
  
   // prepare the claim
 /*    const claim = new IdentitySDK.Claim({
@@ -149,14 +126,23 @@ console.log("Free")
   //const tx = await identity.addClaim(claim.topic, claim.scheme, claim.issuer, claim.signature, claim.data, claim.uri, { _signer });
   //const tx = await issuer.addClaim(topic, claim.scheme, claimsIssuer, claim.signature, claim.data, claim.uri,{gasLimit:3000000});
  //console.log(claim)
- const cdata = ethers.utils.sha256(ethers.utils.toUtf8Bytes(data))
-  const scheme=ethers.utils.sha256(ethers.utils.toUtf8Bytes(JSON.stringify(claimJSON[topic])))
-  const topicBytes32 = ethers.utils.formatBytes32String(topic.toString());
+ console.log(id)
+  const topic =1;
+  const scheme =1;
+  let cdata =   ethers.utils.hexlify(ethers.utils.toUtf8Bytes('KYC'))
 
-  const signature = _signer.signMessage(ethers.utils.keccak256(ethers.utils.defaultAbiCoder.encode(['address', 'uint256', 'bytes'], [id, topic, cdata])));
-
-
-  const tx = await issuer.isClaimValid(claimsIssuer,topic,cdata,signature);
+  
+ 
+  const signature = await _signer.signMessage(
+    ethers.utils.arrayify(
+      ethers.utils.keccak256(
+        ethers.utils.defaultAbiCoder.encode(['address', 'uint256', 'bytes'], [id, topic, cdata]),
+      )));
+   console.log(signature)
+   console.log(cdata)
+  const tx = await issuer.isClaimValid(id,topic,cdata,signature);
+  const i = await getIdentity(signer,claimsIssuer);
+  console.log(i)
  console.log(tx)
   //await tx.wait();
   
@@ -198,6 +184,12 @@ export const addTrustedIssuer = async(signer:any)=>{
  return await tiRegistry.getTrustedIssuerClaimTopics(claimsIssuer);
 }
 
+
+export const addClaimIssuerKey = async(signer:any)=>{
+  const issuer = new ethers.Contract(claimsIssuer,OnChainId.contracts.ClaimIssuer.abi,signer)
+  await issuer.addKey(IdentitySDK.utils.encodeAndHash(['address'], [await signer.getAddress()]), IdentitySDK.utils.enums.KeyPurpose.CLAIM, IdentitySDK.utils.enums.KeyType.ECDSA,{signer});
+ 
+}
 
 
 

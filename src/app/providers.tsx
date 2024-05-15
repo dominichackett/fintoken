@@ -12,7 +12,7 @@ import {
   ledgerWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import {
-  scrollSepolia,zkSyncTestnet,avalancheFuji,
+  sepolia,avalancheFuji,
 } from 'wagmi/chains';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
@@ -51,7 +51,7 @@ const config = getDefaultConfig({
     },
   ],
   chains: [
-    Amoy,scrollSepolia,zkSyncTestnet,avalancheFuji,
+    Amoy,sepolia,avalancheFuji,
     
   ],
   ssr: true,
