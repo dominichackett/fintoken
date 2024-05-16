@@ -109,12 +109,17 @@ import Link from 'next/link';
                            
 
                             <Link
-                              href="/profile"
+                              href="/tokenissuers"
                               className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
                             >
                               Token Issuers
                             </Link>
-                          
+                            <Link
+                              href="/investors"
+                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
+                            >
+                              Investor Management
+                            </Link>
                           </div>
                           
                         </li>}
@@ -143,12 +148,7 @@ import Link from 'next/link';
                               Agents
                             </Link>
 
-                            <Link
-                              href="/profile"
-                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
-                            >
-                              Client Management
-                            </Link>
+                            
                           
                           </div>
                           

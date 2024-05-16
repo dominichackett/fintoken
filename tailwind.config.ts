@@ -45,10 +45,14 @@ module.exports ={
       'body-color': '#A1A0AE',
       'gray-900':'#111827',
       'gray-200':'#e5e7eb',
+      "green-50": "#f0fdf4",
       "green-500": "#22c55e",
       "green-600": "#16a34a",
+      "green-700":"#15803d",
       "red-500": "#ef4444",
       "red-600":"#dc2626",
+      "red-700":"#b91c1c",
+      "red-50":"#fef2f2",
       "blue-500":"#3b82f6",
       'blue-dark': '#0A2540', // Dark blue background color
       'blue-medium': '#1C4B75', // Medium blue color for circular lines
