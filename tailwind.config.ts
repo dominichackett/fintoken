@@ -39,6 +39,7 @@ module.exports ={
       'gray-700':'#374151',
       'gray-50':'#f9fafb',
       'indigo-600': '#4f46e5',
+       'indigo-500':'#6366f1',  
       'indigo-200':'#c7d2fe',
       'indigo-300':'#a5b4fc',
       'body-color': '#A1A0AE',
@@ -47,6 +48,7 @@ module.exports ={
       "green-500": "#22c55e",
       "green-600": "#16a34a",
       "red-500": "#ef4444",
+      "red-600":"#dc2626",
       "blue-500":"#3b82f6",
       'blue-dark': '#0A2540', // Dark blue background color
       'blue-medium': '#1C4B75', // Medium blue color for circular lines

@@ -105,18 +105,8 @@ import Link from 'next/link';
                             className={`${submenuOpen ? 'block' : 'hidden'} submenu relative top-full left-0 w-[250px] rounded-md bg-dark p-4 transition-[top] duration-300 group-hover:opacity-100 lg:invisible lg:absolute lg:top-[110%] lg:block lg:opacity-0 lg:shadow-lg lg:group-hover:visible lg:group-hover:top-full `}
                             
                           >
-                             <Link
-                              href="/profile"
-                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
-                            >
-                              Investor Management
-                            </Link>
-                            <Link
-                              href="/profile"
-                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
-                            >
-                              Agents
-                            </Link>
+                            
+                           
 
                             <Link
                               href="/profile"
