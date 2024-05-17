@@ -10,11 +10,17 @@ import { useState,useEffect } from 'react';
 import { Country, State, City }  from 'country-state-city';
 import * as icountry from "iso-3166-1"
 const people = [
-    { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 0 },
-    { name: 'Linda Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 1 }
+    { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 0 ,
+    image:
+    'https://png.pngtree.com/png-vector/20210522/ourmid/pngtree-vector-illustration-of-crytocurrency-ethereum-png-image_3314668.jpg',
+},
+    { name: 'Linda Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 1,
+    image:
+    'https://upload.wikimedia.org/wikipedia/commons/5/58/Bitcoin_Cash.png',
+}
     // More people...
   ]
-export default function Investors() {
+export default function Tokens() {
   const signer = useEthersSigner()
   
   
@@ -58,11 +64,16 @@ export default function Investors() {
       <div className="space-y-12">
        
         <div className="border-b border-gray-900/10 pb-12 ">
-        <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">Investors</h1>
+        <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">Tokens</h1>
   
-          <h2 className="text-base font-semibold leading-7 text-gray-900">Manage Investors</h2>
-          <p className="mb-6 mt-1 text-sm leading-6 text-gray-600">Manage investor approvals KYC/AML. </p>
-         
+          <h2 className="text-base font-semibold leading-7 text-gray-900">Manage Tokens</h2>
+          <p className="mb-6 mt-1 text-sm leading-6 text-gray-600">Manage your security tokens. </p>
+          <a
+          href="/createtoken"
+          className="rounded-md bg-indigo-600 mt-6 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          Create Security Token
+        </a>
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6 ">
            
           <div className=" col-span-full overflow-hidden shadow ring-1 ring-black ring-opacity-5 sm:rounded-lg">
@@ -73,10 +84,10 @@ export default function Investors() {
                       Name
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
-                      Country
+                      Symbol
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
-                      Email
+                      Address
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
                       Status
@@ -90,8 +101,15 @@ export default function Investors() {
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {people.map((person) => (
                     <tr key={person.email}>
+                        
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                        {person.name}
+                      <div className="flex items-center">
+
+                      <div className="h-11 w-11 flex-shrink-0">
+                          <img className="h-11 w-11 rounded-full" src={person.image} alt="" />
+                        </div>
+                        <div className="ml-4">
+   {person.name}</div></div>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.title}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.email}</td>
@@ -105,7 +123,7 @@ export default function Investors() {
           href='/investor'
           className="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
         >
-          view
+          Manage
         </a>
                       </td>
   

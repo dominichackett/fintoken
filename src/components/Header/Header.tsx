@@ -136,17 +136,12 @@ import Link from 'next/link';
                             
                           >
                              <Link
-                              href="/profile"
+                              href="/tokens"
                               className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
                             >
                               Token Management
                             </Link>
-                            <Link
-                              href="/profile"
-                              className="block rounded py-[10px] px-4 text-sm font-medium text-[#bababa] hover:text-white"
-                            >
-                              Agents
-                            </Link>
+                           
 
                             
                           
