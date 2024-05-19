@@ -354,7 +354,7 @@ export default function Tokens() {
           <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center col-span-2">
             <DocumentArrowUpIcon className="h-12 w-12 text-green-500" />
             
-              <span className="block text-sm font-semibold text-gray-700">Register to Chain</span>
+              <span className="block text-sm font-semibold text-gray-700">Deploy to Blockchain</span>
              
             <div className="w-full mt-2">
               <div className="flex items-center">
