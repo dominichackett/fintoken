@@ -5,10 +5,10 @@ import Footer from '@/components/Footer/Footer'
 import Image from 'next/image';
 import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
-import { CurrencyDollarIcon, LockClosedIcon, LockOpenIcon, PlusCircleIcon, ArrowRightIcon, ArrowLeftIcon ,DocumentArrowUpIcon} from '@heroicons/react/24/solid';
+import { CurrencyDollarIcon, LockClosedIcon, LockOpenIcon, PlusCircleIcon, ArrowRightIcon, ArrowLeftIcon ,DocumentArrowUpIcon,DocumentCheckIcon,XCircleIcon} from '@heroicons/react/24/solid';
+import { Country }  from 'country-state-city';
 
 import { useState,useEffect } from 'react';
-import { Country, State, City }  from 'country-state-city';
 import * as icountry from "iso-3166-1"
 const people = [
     { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 0 ,
@@ -23,7 +23,20 @@ const people = [
   ]
 export default function Tokens() {
   const signer = useEthersSigner()
+  const [countries,setCountries] = useState([])
+
+ useEffect(()=>{
   
+  
+  let data =Country.getAllCountries()
+  let _countries = []
+  for (let country of data){
+     let _c = icountry.whereAlpha2(country.isoCode)
+     _countries.push({numeric:_c?.numeric,country:_c?.country})
+  }
+  setCountries(_countries)
+
+ },[])
   
   return (
     <>
@@ -94,6 +107,9 @@ export default function Tokens() {
             </div>
             <button className="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ml-4">
               Pause Token
+            </button>
+            <button className="inline-flex items-center rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ml-4">
+               Enable Compliance 
             </button>
           </div>
           <div className="col-span-1">
@@ -257,7 +273,98 @@ export default function Tokens() {
             </div>
             
           </div>
+          <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
+            <LockClosedIcon className="h-12 w-12 text-red-500" />
+            
+              <span className="block text-sm font-semibold text-gray-700">Lock Account</span>
+             
+              <div className="w-full mt-2">
+              <div className="flex items-center ">
+                <input
+                  type="text"
+                  className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Address"
+                />
+                <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 ml-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                  Lock
+                </button>
+              </div>
+            </div>
+            
+          </div>
 
+          <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
+            <LockOpenIcon className="h-12 w-12 text-green-500" />
+            
+              <span className="block text-sm font-semibold text-gray-700">UnLock Account</span>
+             
+              <div className="w-full mt-2">
+              <div className="flex items-center ">
+                <input
+                  type="text"
+                  className="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  placeholder="Address"
+                />
+                <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 ml-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                  Unlock
+                </button>
+              </div>
+            </div>
+            
+          </div>
+
+          <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
+            <XCircleIcon className="h-12 w-12 text-red-500" />
+            
+              <span className="block text-sm font-semibold text-gray-700">Restrict Country</span>
+             
+              <div className="w-full mt-2">
+              <div className="flex items-center ">
+              <select 
+        id="countries"
+        className="ml-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+ 
+      >
+        <option value="">Country</option>
+        {countries.map((_country) => (
+          <option key={_country.numeric} value={_country.numeric}>
+            {_country.country} 
+          </option>
+        ))}
+      </select>   
+                <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 ml-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                  Restrict
+                </button>
+              </div>
+            </div>
+            
+          </div>
+          <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center ">
+            <DocumentCheckIcon className="h-12 w-12 text-green-500" />
+            
+              <span className="block text-sm font-semibold text-gray-700">Allow Country</span>
+             
+              <div className="w-full mt-2">
+              <div className="flex items-center ">
+              <select 
+        id="countries"
+        className="ml-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+ 
+      >
+        <option value="">Country</option>
+        {countries.map((_country) => (
+          <option key={_country.numeric} value={_country.numeric}>
+            {_country.country} 
+          </option>
+        ))}
+      </select>   
+                <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 ml-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                  Allow
+                </button>
+              </div>
+            </div>
+            
+          </div>
 
           <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center col-span-3">
             <PlusCircleIcon className="h-12 w-12 text-green-500" />
