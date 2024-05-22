@@ -6,44 +6,165 @@ import Image from 'next/image';
 import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
-import { useState,useEffect } from 'react';
-import { Country, State, City }  from 'country-state-city';
-import * as icountry from "iso-3166-1"
+import { useState,useEffect ,useRef} from 'react';
+import Notification from '@/components/Notification/Notification';
+import { useAccount} from 'wagmi'
+import { ethers } from 'ethers';
+import { uploadToIPFS } from '@/fleek/fleek';
+import { trexGateway,trexGatewayABI } from '@/contracts/contracts';
+import { insertToken } from '@/tableland/tableland';
 export default function CreateToken() {
   const signer = useEthersSigner()
-  const [country,setCountry] = useState()
-  const [countries,setCountries] = useState([])
-  const [state,setState] = useState()
-  const [states,setStates] = useState([])
-  const [city,setCity] = useState()
-  const [cities,setCities] = useState([])
+  const account = useAccount()
+  const [preview, setPreview] = useState('')
+  const [selectedFile, setSelectedFile] = useState(undefined)
+  const filename = useRef()
 
-  const countryChanged = (event:any)=>{
-    const _states = State.getStatesOfCountry(event.target.value)
-    
-     setStates(_states)
-     setCountry(event.target.value)
-   } 
+  useEffect(() => {
+    if (!selectedFile) {
+        setPreview('')
+        return
+    }
+  
+    const objectUrl = URL.createObjectURL(selectedFile)
+    setPreview(objectUrl)
+  
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl)
+  }, [selectedFile])
+  
 
- 
-const stateChanged = (event:any)=>{
- const _cities = City.getCitiesOfState(country,event.target.value)
- console.log(event.target.value)
- console.log(_cities)
-  setCities(_cities)
-  setState(event.target.value)
-}   
+const _createToken =async()=>{
 
-const cityChanged = (event:any)=>{
-  setCity(event.target.value) 
+  if(account.chainId != 80002){
+    setDialogType(2) //Error
+    setNotificationTitle("Create Token");
+    setNotificationDescription("Wrong Network.")
+    setShow(true)
+    return
+  }
+
+  if(!selectedFile)
+  {
+    setDialogType(2) //Error
+    setNotificationTitle("Create Token");
+    setNotificationDescription("Please select an image for your logo.")
+    setShow(true)
+    return
+  }
+  const name  = document.getElementById("name").value 
+  const symbol = document.getElementById("symbol").value 
+  const decimals = document.getElementById("decimals").value
+  const  type = parseInt(document.getElementById("instrument").value )
+  const owner = document.getElementById("owner").value 
+  
+  
+  if(!name || !symbol || !decimals || type==0)
+  {
+
+    setDialogType(2) //Error
+    setNotificationTitle("Create Token");
+    setNotificationDescription("All fields are required.")
+    setShow(true)
+    return
+  }
+  if( !ethers.utils.isAddress(owner))
+  {
+    setDialogType(2) //Error
+    setNotificationTitle("Create Token");
+    setNotificationDescription("A valid ethereum address is required.")
+    setShow(true)
+    return
+  }
+
+  setDialogType(3) //Info
+  setNotificationTitle("Create Token");
+  setNotificationDescription("Uploading token image.")
+  setShow(true)
+
+  const result = await  uploadToIPFS(filename.current,selectedFile)
+  //console.log(await result.json())
+  const cid =result.cid.toV1().toString()
+  const url = `https://${cid}.ipfs.cf-ipfs.com`
+  
+   setShow(false)
+   console.log(data)
+ const contract = new ethers.Contract(trexGateway, trexGatewayABI, signer);
+
+ try{
+
+  const tx= await contract.callStatic.deployTREXSuite({
+    owner: owner,
+    name: name,
+    symbol: symbol,
+    decimals: decimals,
+    irs: ethers.constants.AddressZero,
+    ONCHAINID: ethers.constants.AddressZero,
+    irAgents: [],
+    tokenAgents: [],
+    complianceModules: [],
+    complianceSettings: [],
+  },
+  {
+    claimTopics: [],
+    issuers: [],
+    issuerClaims: [],
+  });
+  const transaction = await contract.deployTREXSuite(issuer);
+  await transaction.wait(); // Wait for the transaction to be mined
+
+  const receipt = await signer.provider.getTransactionReceipt(transaction.hash);
+
+  // Access event data from the receipt (replace 'YourEventName' with your actual event name)
+  console.log(receipt)
+  const iface = new ethers.utils.Interface(trexGatewayABI);
+
+  const events = iface.parseLog(receipt.logs[1]);
+ console.log(events)
+  const tokenId = events.args._token;
+
+     console.log(events.args); // Access event arguments
+  await  insertToken(tokenId,name,symbol,decimals,type,owner,account.address,url);
+  setDialogType(1) //Success
+  setNotificationTitle("Create Token");
+  setNotificationDescription("Token created successfully.")
+  setShow(true)
+
+}catch(error)
+{
+  setDialogType(2) //Error
+  setNotificationTitle("Create Token");
+  setNotificationDescription(error?.message)
+  setShow(true)
+
 }
 
-useEffect(()=>{
-    //setCountries(Country.getAllCountries())
-    //console.log( Country.getAllCountries())
-     console.log(icountry.all())
-     setCountries(icountry.all())
-},[])
+
+}  
+
+  
+ // NOTIFICATIONS functions
+ const [notificationTitle, setNotificationTitle] = useState();
+ const [notificationDescription, setNotificationDescription] = useState();
+ const [dialogType, setDialogType] = useState(1);
+ const [show, setShow] = useState(false);
+ const close = async () => {
+setShow(false);
+};
+
+const PicSelected = async (e:any) => {
+  if (!e.target.files || e.target.files.length === 0) {
+    setSelectedFile(undefined)
+    return
+}
+
+// I've kept this example simple by using the first image instead of multiple
+setSelectedFile(e.target.files[0])
+filename.current = e.target.files[0].name
+  
+  }
+
+
   return (
     <>
       <Head>
@@ -194,14 +315,20 @@ useEffect(()=>{
               </label>
               <div className="mt-2 flex justify-center rounded-lg border border-dashed border-gray-900/25 px-6 py-10">
                 <div className="text-center">
-                  <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
+
+                  { preview ? <img
+                 className="h-40 w-40 rounded-lg border-my-blue border-2"
+                 src={preview}
+                 alt=""
+               /> :                   <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
+              }
                   <div className="mt-4 flex text-sm leading-6 text-gray-600">
                     <label
                       htmlFor="file-upload"
                       className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
                     >
                       <span>Upload a file</span>
-                      <input id="file-upload" name="file-upload" type="file" className="sr-only" />
+                      <input id="file-upload" name="file-upload" type="file" className="sr-only" onChange={PicSelected}  />
                     </label>
                     <p className="pl-1">or drag and drop</p>
                   </div>
@@ -215,7 +342,8 @@ useEffect(()=>{
       <div className="mt-6 flex items-center justify-end gap-x-6">
       
         <button
-          type="submit"
+          type="button"
+          onClick={()=>_createToken()}
           className="w-80 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Create Token
@@ -229,6 +357,13 @@ useEffect(()=>{
 
       
     </section>
+    <Notification
+        type={dialogType}
+        show={show}
+        close={close}
+        title={notificationTitle}
+        description={notificationDescription}
+      />
     <Footer />
      </main>
      </>

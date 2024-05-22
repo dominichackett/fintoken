@@ -7,6 +7,7 @@ import { createIdentity,getIdentity ,allowKYCClaim,approveKYC,getClaims,validate
   ,addAgent,isVerified,getTopics,addTrustedIssuer,addClaimIssuerKey} from '@/identity/identity';
 import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
+import { alterTable } from '@/tableland/tableland';
 
 export default function Home() {
   const signer = useEthersSigner()
@@ -165,6 +166,11 @@ const _addClaimsIssuerKey= async()=>{
   }
 }
 
+const _alterTable = async()=>{
+  await alterTable();
+  alert("Tables Altered")
+}
+
   return (
     <>
       <Head>
@@ -285,6 +291,12 @@ FinToken is a pioneering platform empowering banks and asset managers to tokeniz
                                   className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
 
                 onClick={_addClaimsIssuerKey}>Add Claims Issuer Key</button>
+
+<button 
+                                  className="mb-5 inline-flex items-center justify-center rounded-md border-2 border-white py-3 px-7 text-base font-semibold text-white transition-all hover:border-blue-light hover:bg-blue-light"
+
+                onClick={_alterTable}>alterTable</button>
+
 
 
               </div>

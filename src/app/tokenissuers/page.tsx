@@ -9,14 +9,23 @@ import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { useState,useEffect } from 'react';
 import { Country, State, City }  from 'country-state-city';
 import * as icountry from "iso-3166-1"
+
+import { queryTokenIssuers } from '@/tableland/tableland';
 const people = [
     { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', role: 'Member' },
     // More people...
   ]
 export default function TokenIssuers() {
   const signer = useEthersSigner()
-  
-  
+  const [issuers,setIssuers] = useState([])
+  useEffect(()=>{
+      async function getIssuers(){
+        const _issuers = await queryTokenIssuers()
+        setIssuers(_issuers)
+      } 
+      getIssuers()
+  },[]
+  )
   return (
     <>
       <Head>
@@ -89,13 +98,13 @@ export default function TokenIssuers() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {people.map((person) => (
-                    <tr key={person.email}>
+                  {issuers.map((person) => (
+                    <tr key={person.id}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                        {person.name}
+                        {person.firstname} {person.lastname}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.title}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.email}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.company}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.id}</td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                       <button
           type="submit"

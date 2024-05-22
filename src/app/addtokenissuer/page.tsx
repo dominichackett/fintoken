@@ -9,10 +9,79 @@ import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { useState,useEffect } from 'react';
 import { Country, State, City }  from 'country-state-city';
 import * as icountry from "iso-3166-1"
+import { insertTokenIssuer } from '@/tableland/tableland';
+import { trexGateway,trexGatewayABI } from '@/contracts/contracts';
+import { ethers } from 'ethers';
+import Notification from '@/components/Notification/Notification';
+import { useAccount} from 'wagmi'
+
 export default function AddIssuer() {
   const signer = useEthersSigner()
-  
-  
+  const account = useAccount()
+  const addIssuer = async()=>{
+      if(account.chainId != 80002){
+        setDialogType(2) //Error
+        setNotificationTitle("Add Issuer");
+        setNotificationDescription("Wrong Network.")
+        setShow(true)
+        return
+      }
+
+      const firstname  = document.getElementById("firstname").value 
+      const lastname = document.getElementById("lastname").value 
+      const company = document.getElementById("company").value
+      const issuer = document.getElementById("issuer").value 
+      if(!firstname || !lastname || !company)
+      {
+
+        setDialogType(2) //Error
+        setNotificationTitle("Add Issuer");
+        setNotificationDescription("All fields are required.")
+        setShow(true)
+        return
+      }
+      if( !ethers.utils.isAddress(issuer))
+      {
+        setDialogType(2) //Error
+        setNotificationTitle("Add Issuer");
+        setNotificationDescription("A valid ethereum address is required.")
+        setShow(true)
+        return
+      }
+
+      const contract = new ethers.Contract(trexGateway, trexGatewayABI, signer);
+
+      try{
+
+        const tx= await contract.callStatic.addDeployer(issuer);
+        const transaction = await contract.addDeployer(issuer);
+        await transaction.wait(); // Wait for the transaction to be mined
+        await  insertTokenIssuer(issuer,firstname,lastname,company);
+        setDialogType(1) //Success
+        setNotificationTitle("Add Issuer");
+        setNotificationDescription("Token issuer added successfully.")
+        setShow(true)
+
+      }catch(error)
+      {
+        setDialogType(2) //Error
+        setNotificationTitle("Add Issuer");
+        setNotificationDescription(error?.message)
+        setShow(true)
+
+      }
+
+      
+
+  }
+  // NOTIFICATIONS functions
+  const [notificationTitle, setNotificationTitle] = useState();
+  const [notificationDescription, setNotificationDescription] = useState();
+  const [dialogType, setDialogType] = useState(1);
+  const [show, setShow] = useState(false);
+  const close = async () => {
+setShow(false);
+};
   return (
     <>
       <Head>
@@ -134,7 +203,8 @@ export default function AddIssuer() {
       <div className="mt-6 flex items-center justify-end gap-x-6">
       
         <button
-          type="submit"
+        type="button"
+          onClick={()=>addIssuer()}
           className="w-80 rounded-md bg-indigo-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Add Issuer
@@ -149,6 +219,13 @@ export default function AddIssuer() {
       
     </section>
     <Footer />
+    <Notification
+        type={dialogType}
+        show={show}
+        close={close}
+        title={notificationTitle}
+        description={notificationDescription}
+      />
      </main>
      </>
   )
