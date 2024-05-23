@@ -7,23 +7,27 @@ import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
 import { CurrencyDollarIcon, LockClosedIcon, LockOpenIcon, PlusCircleIcon, ArrowRightIcon, ArrowLeftIcon ,DocumentArrowUpIcon,DocumentCheckIcon,XCircleIcon} from '@heroicons/react/24/solid';
 import { Country }  from 'country-state-city';
-
+import { useAccount} from 'wagmi'
+import { queryToken } from '@/tableland/tableland';
 import { useState,useEffect } from 'react';
 import * as icountry from "iso-3166-1"
-const people = [
-    { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 0 ,
-    image:
-    'https://png.pngtree.com/png-vector/20210522/ourmid/pngtree-vector-illustration-of-crytocurrency-ethereum-png-image_3314668.jpg',
-},
-    { name: 'Linda Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 1,
-    image:
-    'https://upload.wikimedia.org/wikipedia/commons/5/58/Bitcoin_Cash.png',
-}
-    // More people...
-  ]
-export default function Tokens() {
+import Notification from '@/components/Notification/Notification';
+export default function Token({params}) {
   const signer = useEthersSigner()
   const [countries,setCountries] = useState([])
+  const account = useAccount()
+  const [gotToken,setGotToken] = useState()
+  const  [token,setToken] = useState()
+
+   // NOTIFICATIONS functions
+ const [notificationTitle, setNotificationTitle] = useState();
+ const [notificationDescription, setNotificationDescription] = useState();
+ const [dialogType, setDialogType] = useState(1);
+ const [show, setShow] = useState(false);
+ const close = async () => {
+setShow(false);
+};
+
 
  useEffect(()=>{
   
@@ -35,6 +39,32 @@ export default function Tokens() {
      _countries.push({numeric:_c?.numeric,country:_c?.country})
   }
   setCountries(_countries)
+
+  async function getToken(){
+
+    const _token = await queryToken(params.id)
+    if(_token.length > 0)
+         {
+            console.log(_token)
+            setToken(_token[0])
+           
+            setGotToken(true)
+  
+         } 
+         else
+         {
+            setDialogType(2) //Error
+            setNotificationTitle("Token");
+            setNotificationDescription("Token not found.")
+            setShow(true)
+            return
+         }
+
+
+
+  }
+
+  getToken()
 
  },[])
   
@@ -74,20 +104,20 @@ export default function Tokens() {
   
       <div className="container ">
       <div className="min-h-screen flex flex-col  bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-md shadow-xl p-6">
+      <div className="w-full mx-auto bg-white rounded-md shadow-xl p-6">
         {/* Header Section */}
         <div className="flex items-center mb-6">
           <div className="h-11 w-11 flex-shrink-0">
             <img
               className="h-11 w-11 rounded-full"
-              src="https://png.pngtree.com/png-vector/20210522/ourmid/pngtree-vector-illustration-of-crytocurrency-ethereum-png-image_3314668.jpg"
-              alt="Ethereum Logo"
+              src={token?.logo ? token.logo : "/images/sepolia.png"}
+              alt="Logo"
             />
           </div>
           <div className="ml-4">
-            <div className="font-bold text-xl text-gray-900">DLH</div>
-            <div className="mt-1 text-gray-500">Defi Lama Hackett</div>
-            <div className="mt-1  font-bold text-gray-500">Decimals: 0</div>
+            <div className="font-bold text-xl text-gray-900">{token?.name}</div>
+            <div className="mt-1 text-gray-500">{token?.symbol}</div>
+            <div className="mt-1  font-bold text-gray-500">Decimals: {token?.decimals}</div>
             <div className="mt-1  font-bold text-gray-500">Asset Type: Equities</div>
 
 
@@ -98,7 +128,7 @@ export default function Tokens() {
         <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6">
           <div className="col-span-1">
             <span className="block text-sm font-semibold text-gray-700">Token Address:</span>
-            <span className="block text-sm text-gray-900 mt-1">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D</span>
+            <span className="block text-sm text-gray-900 mt-1">{token?.id}</span>
           </div>
           <div className="col-span-1 flex justify-between items-center">
             <div>
@@ -112,26 +142,10 @@ export default function Tokens() {
                Enable Compliance 
             </button>
           </div>
-          <div className="col-span-1">
-            <span className="block text-sm font-semibold text-gray-700">Valuation:</span>
-            <span className="block text-sm text-gray-900 mt-1">$123,456,789</span>
-          </div>
+        
         </div>
 
-        {/* Valuation Section */}
-        <div className="mt-6">
-          <div className="flex items-center">
-            <span className="block text-sm font-semibold text-gray-700 mr-4">Set Valuation:</span>
-            <input
-              type="text"
-              className="block w-full sm:w-auto flex-grow p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Enter new valuation"
-            />
-            <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 ml-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-              Update
-            </button>
-          </div>
-        </div>
+      
 
         {/* Additional Information Section */}
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -159,7 +173,7 @@ export default function Tokens() {
         </div>
       </div>
 
-      <div className="mt-10 max-w-4xl mx-auto bg-white rounded-md shadow-xl p-6">
+      <div className="w-full mt-10  mx-auto bg-white rounded-md shadow-xl p-6">
         {/* Header Section */}
         <div className="flex items-center mb-6">
           <div >
@@ -401,7 +415,7 @@ export default function Tokens() {
         </div>
       </div>
 
-      <div className="mt-10 max-w-4xl mx-auto bg-white rounded-md shadow-xl p-6">
+      <div className="w-full mt-10  mx-auto bg-white rounded-md shadow-xl p-6">
         {/* Header Section */}
         <div className="flex items-center mb-6">
           <div >
@@ -422,7 +436,7 @@ export default function Tokens() {
         <img className="mx-auto h-32 w-32 flex-shrink-0 rounded-full" src="/images/amoy.png" alt="" />
             
               <span className="block text-sm font-semibold text-gray-700">Polygon Amoy</span>
-              <span className="block text-xs font-semibold text-gray-700 w-full">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
+              <span className="block text-sm font-semibold text-gray-700 ">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
 </span>
 
           
@@ -434,7 +448,7 @@ export default function Tokens() {
         <img className="mx-auto h-32 w-32 flex-shrink-0 rounded-full" src="/images/fuji.png" alt="" />
             
               <span className="block text-sm font-semibold text-gray-700">Avalanche Fuji</span>
-              <span className="block text-xs font-semibold text-gray-700 w-full">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
+              <span className="block text-sm font-semibold text-gray-700 ">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
 </span>
 
           
@@ -447,7 +461,7 @@ export default function Tokens() {
         <img className="mx-auto h-32 w-32 flex-shrink-0 rounded-full" src="/images/sepolia.webp" alt="" />
             
               <span className="block text-sm font-semibold text-gray-700">Ethereum</span>
-              <span className="block text-xs font-semibold text-gray-700 w-full">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
+              <span className="block text-sm font-semibold text-gray-700">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
 </span>
 
           
@@ -502,6 +516,13 @@ export default function Tokens() {
       
     </section>
     <Footer />
+    <Notification
+        type={dialogType}
+        show={show}
+        close={close}
+        title={notificationTitle}
+        description={notificationDescription}
+      />
      </main>
      </>
   )

@@ -34,10 +34,8 @@ useEffect(()=>{
      
 
      async function getInvestor(){
-      console.log(account.address)
-      let id = await getIdentity(signer,account.address)
-      console.log(id)
-        const _investor = await queryInvestor(id)
+     
+        const _investor = await queryInvestor(account.address)
          if(_investor.length > 0)
          {
             console.log(_investor)
@@ -111,7 +109,7 @@ setShow(false);
       <div className="space-y-12">
        
         <div className="border-b border-gray-900/10 pb-12">
-        <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">View Investor Profile</h1>
+        <h1 className="font-bold text-4xl text-gray-900 mb-10">Investor Profile</h1>
   
           <h2 className=" text-base font-semibold leading-7 text-gray-900">Investor Status</h2>
           {investor &&<span className={investor?.kyc == 0?`mt-4 inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-3xl font-medium text-red-700 ring-1 ring-inset ring-red-600/20`:`mt-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-3xl font-medium text-green-700 ring-1 ring-inset ring-green-600/20`}>
@@ -177,6 +175,7 @@ setShow(false);
               <div className="mt-2">
               <select value={investor?.country}
         id="countries"
+        disabled={true}
         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                
  
@@ -290,7 +289,6 @@ setShow(false);
         title={notificationTitle}
         description={notificationDescription}
       />
-    <Footer />
 
      </main>
      </>

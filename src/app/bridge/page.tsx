@@ -62,7 +62,7 @@ export default function Bridge() {
       <div className="space-y-12">
        
         <div className="border-b border-gray-900/10 pb-12">
-        <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">Token Bridge</h1>
+        <h1 className="font-bold text-4xl text-gray-900 mb-10">Token Bridge</h1>
   
         
         </div>

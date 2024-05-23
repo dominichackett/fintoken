@@ -2,15 +2,16 @@
 import Head from 'next/head'
 import Header from '@/components/Header/Header'
 import Footer from '@/components/Footer/Footer'
-import Image from 'next/image';
-import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
-import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { useState,useEffect } from 'react';
 import {  State, City }  from 'country-state-city';
 import * as icountry from "iso-3166-1"
 import { queryInvestor } from '@/tableland/tableland';
 import Notification from '@/components/Notification/Notification';
+import { approveKYC,registerIdentity } from '@/identity/identity'
+import { kycApproved } from '@/tableland/tableland'
+import { useAccount} from 'wagmi'
+
 export default function InvestorProfile({params}) {
   const signer = useEthersSigner()
   const [country,setCountry] = useState()
@@ -21,34 +22,13 @@ export default function InvestorProfile({params}) {
   const [cities,setCities] = useState([])
   const [investorFound,setInvestorFound] = useState(false)
   const [investor,setInvestor] = useState()
-  const countryChanged = (event:any)=>{
-    const _states = State.getStatesOfCountry(event.target.value)
-    
-     setStates(_states)
-     setCountry(event.target.value)
-   } 
-
- 
-const stateChanged = (event:any)=>{
- const _cities = City.getCitiesOfState(country,event.target.value)
- console.log(event.target.value)
- console.log(_cities)
-  setCities(_cities)
-  setState(event.target.value)
-}   
-
-const cityChanged = (event:any)=>{
-  setCity(event.target.value) 
-}
+  const [refreshData,setRefreshData] = useState(new Date().getTime())
+  const account = useAccount()
 
 useEffect(()=>{
-    //setCountries(Country.getAllCountries())
-    //console.log( Country.getAllCountries())
-     console.log(icountry.all())
-     
+    
 
      async function getInvestor(){
-        console.log(params.id)
          const _investor = await queryInvestor(params.id)
          if(_investor.length > 0)
          {
@@ -59,6 +39,7 @@ useEffect(()=>{
             setStates(_states)
             const _cities = City.getCitiesOfState(_investor[0].country,_investor[0].state)
             setCities(_cities)
+            setInvestorFound(true)
   
          } 
          else
@@ -72,7 +53,7 @@ useEffect(()=>{
      }
 
      getInvestor()
-},[])
+},[refreshData])
 
 // NOTIFICATIONS functions
 const [notificationTitle, setNotificationTitle] = useState();
@@ -82,6 +63,45 @@ const [show, setShow] = useState(false);
 const close = async () => {
 setShow(false);
 };
+
+const approveInvestor = async()=>{
+    if(!investorFound)
+       return
+   
+   
+  if(account.chainId != 80002){
+    setDialogType(2) //Error
+    setNotificationTitle("Approve Investor");
+    setNotificationDescription("Wrong Network.")
+    setShow(true)
+    return
+  }
+    try {
+    
+    setDialogType(3) //
+    setNotificationTitle("Approve Investor");
+    setNotificationDescription("Approving Investor.")
+    setShow(true)
+   
+    await approveKYC(signer,params.id)
+    await registerIdentity(signer,params.id,icountry.whereAlpha2(investor.country)?.numeric)
+    await kycApproved(params.id)
+    setDialogType(1) //
+    setNotificationTitle("Approve Investor");
+    setNotificationDescription("Investor approved.")
+    setShow(true)
+    setRefreshData(new Date().getTime())
+   }catch(error)
+
+   {
+
+    setDialogType(2) //Error
+    setNotificationTitle("Approve Investor");
+    setNotificationDescription(error.message)
+    setShow(true)
+    return
+   }
+}
   return (
     <>
       <Head>
@@ -122,10 +142,10 @@ setShow(false);
       <div className="space-y-12">
        
         <div className="border-b border-gray-900/10 pb-12">
-        <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">View Investor Profile</h1>
+        <h1 className="font-bold text-4xl text-gray-900 mb-10">View Investor Profile</h1>
   
           <h2 className="text-base font-semibold leading-7 text-gray-900">Investor Status</h2>
-          {investor &&<span className={investor?.kyc == 0?`inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-3xl font-medium text-red-700 ring-1 ring-inset ring-red-600/20`:`inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-3xl font-medium text-green-700 ring-1 ring-inset ring-green-600/20`}>
+          {investor &&<span className={investor?.kyc == 0?`inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-2xl font-medium text-red-700 ring-1 ring-inset ring-red-600/20`:`inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-2xl font-medium text-green-700 ring-1 ring-inset ring-green-600/20`}>
                         {investor?.kyc ==0 ? "Unverified":"Verified"}
                       </span>}
 
@@ -188,6 +208,7 @@ setShow(false);
               <div className="mt-2">
               <select value={investor?.country}
         id="countries"
+        disabled={true}
         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                
  
@@ -287,7 +308,8 @@ setShow(false);
       <div className="mt-6 flex items-center justify-end gap-x-6">
       
         <button
-          type="submit"
+          type="button"
+          onClick={()=>approveInvestor()}
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
         >
           Approve KYC
@@ -309,7 +331,6 @@ setShow(false);
         title={notificationTitle}
         description={notificationDescription}
       />
-    <Footer />
 
      </main>
      </>

@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { useState,useEffect } from 'react';
-import { Country, State, City }  from 'country-state-city';
+import { State, City }  from 'country-state-city';
 import * as icountry from "iso-3166-1"
 import Notification from '@/components/Notification/Notification';
 import { useAccount} from 'wagmi'
@@ -100,7 +100,7 @@ const _register = async()=>{
       setNotificationTitle("Investor Signup");
       setNotificationDescription("Registering please wait.")
       setShow(true)
-      await insertInvestor(id,firstname,lastname,email,country,state,city,street,zip)
+      await insertInvestor(account.address,firstname,lastname,email,country,state,city,street,zip)
       setDialogType(1) //Success
       setNotificationTitle("Investor Signup");
       setNotificationDescription("Investor registration successfull")
@@ -154,7 +154,7 @@ const _register = async()=>{
       <div className="space-y-12">
        
         <div className="border-b border-gray-900/10 pb-12">
-        <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">Investor Registration</h1>
+        <h1 className=" font-bold text-4xl text-gray-900 mb-10">Investor Registration</h1>
   
           <h2 className="text-base font-semibold leading-7 text-gray-900">Personal Information</h2>
           <p className="mt-1 text-sm leading-6 text-gray-600">Use a permanent address where you can receive mail.</p>

@@ -156,11 +156,11 @@ export const addAgent = async(signer:any,address:string)=>{
   //await idRegistryStorage.addAgent(identityRegistry)
   console.log(await idRegistryStorage.addAgent(identityRegistry)) 
 }
-export const registerIdentity =async (signer:any,address:string)=>{
+export const registerIdentity =async (signer:any,address:string,country:number)=>{
   const id = await getIdentity(signer,address);
   console.log(id)
   const idRegistry = new ethers.Contract(identityRegistry,identityRegistryABI,signer)
-   await idRegistry.registerIdentity(address,id,780)
+   await idRegistry.registerIdentity(address,id,country)
 
 
 }

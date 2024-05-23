@@ -63,11 +63,11 @@ export default function Tokens() {
   
       <div className="container ">
         <div className="-mx-4  bg-white flex justify-center items-center ml-5 mr-5 pt-10  pb-10  rounded-xl border border-black">
-        <form>
-      <div className="space-y-12">
+        <form  className="w-full">
+      <div className="w-full  p-24 pt-2  space-y-12">
        
         <div className="border-b border-gray-900/10 pb-12 ">
-        <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">Tokens</h1>
+        <h1 className=" font-bold text-3xl text-gray-900 mb-10">Tokens</h1>
   
           <h2 className="text-base font-semibold leading-7 text-gray-900">Manage Tokens</h2>
           <p className="mb-6 mt-1 text-sm leading-6 text-gray-600">Tokenize your assets. </p>
@@ -86,13 +86,13 @@ export default function Tokens() {
                     <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white sm:pl-6">
                       Name
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-white">
                       Symbol
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
                       Address
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
+                    <th scope="col" className="px-3 py-3.5 text-center text-sm font-semibold text-white">
                       Status
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-white">
@@ -114,7 +114,7 @@ export default function Tokens() {
                         <div className="ml-4">
    {token.name}</div></div>
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{token.symbol}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-center text-sm text-gray-500">{token.symbol}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{token.id}</td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
                       <span className={token.status == 0?`inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20`:`inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20`}>

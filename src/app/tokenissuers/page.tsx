@@ -62,11 +62,11 @@ export default function TokenIssuers() {
   
       <div className="container ">
         <div className="-mx-4  bg-white flex justify-center items-center ml-5 mr-5 pt-10  pb-10  rounded-xl border border-black">
-        <form>
-      <div className="space-y-12">
-       
+        <form  className="w-full">
+      <div className="w-full  p-24 pt-2 space-y-12">
+        
         <div className="border-b border-gray-900/10 pb-12">
-        <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">Token Issuers</h1>
+        <h1 className=" font-bold text-4xl text-gray-900 mb-10">Token Issuers</h1>
   
           <h2 className="text-base font-semibold leading-7 text-gray-900">Manage Token Issuers</h2>
           <p className="mb-6 mt-1 text-sm leading-6 text-gray-600">Your authorized token issuers information. </p>

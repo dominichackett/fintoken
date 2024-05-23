@@ -29,6 +29,7 @@
     "pino-pretty": "^11.0.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-number-format": "^5.3.4",
     "viem": "^2.8.12",
     "wagmi": "^2.5.11"
   },
