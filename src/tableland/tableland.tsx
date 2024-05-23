@@ -141,7 +141,7 @@ await insert.txn?.wait();
 export const insertToken =async (id:string,name:string,symbol:string,decimals:number,type:number,owner:string,issuer:string,logo:string) => {
     // Insert a row into the table
 const { meta: insert } = await db
-.prepare(`INSERT INTO ${tokensTable} (id, name,symbol,decimals,type,owner,issuer,logo) VALUES ( ?,?,?,?,?,?,?,?);`)
+.prepare(`INSERT INTO ${tokensTable} (id, name,symbol,decimals,type,owner,issuer,logo,status) VALUES ( ?,?,?,?,?,?,?,?,0);`)
 .bind(id, name,symbol,decimals,type,owner,issuer,logo)
 .run();
 

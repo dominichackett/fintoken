@@ -11,8 +11,9 @@ import Notification from '@/components/Notification/Notification';
 import { useAccount} from 'wagmi'
 import { ethers } from 'ethers';
 import { uploadToIPFS } from '@/fleek/fleek';
-import { trexGateway,trexGatewayABI } from '@/contracts/contracts';
+import { trexGateway,trexGatewayABI ,factoryAddress,factoryABI} from '@/contracts/contracts';
 import { insertToken } from '@/tableland/tableland';
+import { generateSalt } from '../../../utils/utils';
 export default function CreateToken() {
   const signer = useEthersSigner()
   const account = useAccount()
@@ -55,11 +56,21 @@ const _createToken =async()=>{
   const name  = document.getElementById("name").value 
   const symbol = document.getElementById("symbol").value 
   const decimals = document.getElementById("decimals").value
-  const  type = parseInt(document.getElementById("instrument").value )
+  const  instrument = parseInt(document.getElementById("instrument").value )
   const owner = document.getElementById("owner").value 
+
+  const salt =owner.toLowerCase()+name
   
+  //generateSalt(owner,name);
+  console.log(salt)
+  console.log(name)
+  console.log(symbol)
+  console.log(decimals)
+  console.log(instrument)
+  console.log(document.getElementById("instrument").value)
+  console.log(owner)
   
-  if(!name || !symbol || !decimals || type==0)
+  if(!name || !symbol || !decimals || instrument==0)
   {
 
     setDialogType(2) //Error
@@ -88,12 +99,14 @@ const _createToken =async()=>{
   const url = `https://${cid}.ipfs.cf-ipfs.com`
   
    setShow(false)
-   console.log(data)
+  
+
  const contract = new ethers.Contract(trexGateway, trexGatewayABI, signer);
-
+ const factory = new ethers.Contract(factoryAddress,factoryABI,signer)
+ 
+ 
  try{
-
-  const tx= await contract.callStatic.deployTREXSuite({
+    const tx= await contract.callStatic.deployTREXSuite({
     owner: owner,
     name: name,
     symbol: symbol,
@@ -106,25 +119,31 @@ const _createToken =async()=>{
     complianceSettings: [],
   },
   {
-    claimTopics: [],
-    issuers: [],
-    issuerClaims: [],
+    claimTopics: [ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC'))],
+    issuers: ["0x9535C4c184bE5627FF077079215d1bcdfE9352e2"],
+    issuerClaims: [[ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC'))]],
   });
-  const transaction = await contract.deployTREXSuite(issuer);
+  const transaction = await contract.deployTREXSuite({
+    owner: owner,
+    name: name,
+    symbol: symbol,
+    decimals: decimals,
+    irs: ethers.constants.AddressZero,
+    ONCHAINID: ethers.constants.AddressZero,
+    irAgents: [],
+    tokenAgents: [],
+    complianceModules: [],
+    complianceSettings: [],
+  },
+  {
+    claimTopics: [ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC'))],
+    issuers: ["0x9535C4c184bE5627FF077079215d1bcdfE9352e2"],
+    issuerClaims: [[ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC'))]],
+  });
   await transaction.wait(); // Wait for the transaction to be mined
 
-  const receipt = await signer.provider.getTransactionReceipt(transaction.hash);
-
-  // Access event data from the receipt (replace 'YourEventName' with your actual event name)
-  console.log(receipt)
-  const iface = new ethers.utils.Interface(trexGatewayABI);
-
-  const events = iface.parseLog(receipt.logs[1]);
- console.log(events)
-  const tokenId = events.args._token;
-
-     console.log(events.args); // Access event arguments
-  await  insertToken(tokenId,name,symbol,decimals,type,owner,account.address,url);
+  const tokenId = await factory.tokenDeployed(salt)
+  await  insertToken(tokenId,name,symbol,decimals,instrument,owner,account.address,url);
   setDialogType(1) //Success
   setNotificationTitle("Create Token");
   setNotificationDescription("Token created successfully.")
