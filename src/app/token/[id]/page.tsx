@@ -12,12 +12,30 @@ import { queryToken } from '@/tableland/tableland';
 import { useState,useEffect } from 'react';
 import * as icountry from "iso-3166-1"
 import Notification from '@/components/Notification/Notification';
+import numeral from 'numeral';
+import { tokenABI } from '@/contracts/contracts';
+import { ethers } from 'ethers';
 export default function Token({params}) {
   const signer = useEthersSigner()
   const [countries,setCountries] = useState([])
   const account = useAccount()
   const [gotToken,setGotToken] = useState()
   const  [token,setToken] = useState()
+  const [totalSupply,setTotalSupply] = useState(100000000)
+  const [lockedTokens,setLockedTokens] = useState(0)
+  const [unLockedTokens,setUnLockedTokens] = useState(0)
+  const [refreshData,setRefreshData] = useState(new Date().getTime())
+  const [paused,setPaused] = useState()
+  const [compliance,setCompliance] = useState()
+  const [deployedChains, setDeployedChains] = useState(new Map([
+    [1, {chainId:80002,name:'Polygon Amoy',address:'0xc74574c03E649C793bC08e5b40d7775840Ee4A9D',image:"/images/amoy.png"}],
+
+    [2, {chainId:43113,name:'Fuji',address:'0xc74574c03E649C793bC08e5b40d7775840Ee4A9D',image:"/images/fuji.png"}],
+    [3, {chainId:11155111, name:'Sepolia',address:'0xc74574c03E649C793bC08e5b40d7775840Ee4A9D',image:"/images/sepolia.webp"}]
+    
+  ]));
+  
+  const [tokenType,setTokenType] = useState(new Map([[1,"Bond"],[1,"Commodity"],[3,"Equity"],[4,"Real Estate"],[5,"Stable Coint"],[6,"Other"]]))
 
    // NOTIFICATIONS functions
  const [notificationTitle, setNotificationTitle] = useState();
@@ -67,7 +85,22 @@ setShow(false);
   getToken()
 
  },[])
-  
+
+ useEffect(()=>{
+  async function getTokenData(){
+      if(account?.chainId != 80002)
+        return
+      const contract =  new ethers.Contract(params.id,tokenABI,signer)
+      setTotalSupply(await contract.totalSupply())
+      setPaused(await contract.paused())
+      setCompliance(await contract.compliance())
+  } 
+  getTokenData()
+ },[account,refreshData])
+
+ const togglePauseToken = async()=>{
+
+ }
   return (
     <>
       <Head>
@@ -117,8 +150,8 @@ setShow(false);
           <div className="ml-4">
             <div className="font-bold text-xl text-gray-900">{token?.name}</div>
             <div className="mt-1 text-gray-500">{token?.symbol}</div>
-            <div className="mt-1  font-bold text-gray-500">Decimals: {token?.decimals}</div>
-            <div className="mt-1  font-bold text-gray-500">Asset Type: Equities</div>
+            <div className="mt-1  font-bold text-black"><span>Decimals:</span> <span className="ml-2  font-bold text-gray-500">{token?.decimals}</span></div>
+            <div className="mt-1  font-bold text-black"><span>Asset Type:</span> <span className="ml-2  font-bold text-gray-500">{tokenType.get(token?.type)}</span></div>
 
 
           </div>
@@ -135,8 +168,11 @@ setShow(false);
               <span className="block text-sm font-semibold text-gray-700">Status:</span>
               <span className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-sm font-medium text-green-700 ring-1 ring-inset ring-green-600/20 mt-1">Active</span>
             </div>
-            <button className="inline-flex items-center rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ml-4">
-              Pause Token
+            <button className={`inline-flex items-center rounded-md ${token?.status == 0 ? "bg-gree-600":"bg-red-600"} px-4 py-2 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 ml-4`}
+              onClick={(()=>togglePauseToken())}
+            >
+            
+              {token?.status == 0 ? "Unpause Token": "Pause Token"}
             </button>
             <button className="inline-flex items-center rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ml-4">
                Enable Compliance 
@@ -153,21 +189,21 @@ setShow(false);
             <CurrencyDollarIcon className="h-12 w-12 text-gray-500" />
             
               <span className="block text-sm font-semibold text-gray-700 mt-1">Circulating Token Supply</span>
-              <span className="block text-lg text-gray-500 mt-1">10,000,000</span>
+              <span className="block text-lg text-gray-500 mt-1">{numeral(totalSupply).format('0,0')}</span>
             
           </div>
           <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
             <LockClosedIcon className="h-12 w-12 text-red-500 " />
             
               <span className="block text-sm font-semibold text-gray-700">Total Tokens Locked</span>
-              <span className="block text-lg text-red-500 mt-1">5,000,000</span>
+              <span className="block text-lg text-red-500 mt-1">{numeral(lockedTokens).format('0,0')}</span>
             
           </div>
           <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
             <LockOpenIcon className="h-12 w-12 text-green-500" />
             
               <span className="block text-sm font-semibold text-gray-700">Total Tokens Unlocked</span>
-              <span className="block text-lg text-green-500 mt-1">5,000,000</span>
+              <span className="block text-lg text-green-500 mt-1">{numeral(unLockedTokens).format('0,0')}</span>
             
           </div>
         </div>
@@ -432,44 +468,19 @@ setShow(false);
      
           
           
-          <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
-        <img className="mx-auto h-32 w-32 flex-shrink-0 rounded-full" src="/images/amoy.png" alt="" />
+     {[...deployedChains].map(([key,chain]) =>(     <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
+        <img className="mx-auto h-32 w-32 flex-shrink-0 rounded-full" src={chain.image} alt="" />
             
-              <span className="block text-sm font-semibold text-gray-700">Polygon Amoy</span>
-              <span className="block text-sm font-semibold text-gray-700 ">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
+              <span className="block text-sm font-semibold text-gray-700">{chain.name}</span>
+              <span className="block text-sm font-semibold text-gray-700 ">{chain.address}
 </span>
 
           
         
             
-          </div>
+          </div>))}
 
-          <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
-        <img className="mx-auto h-32 w-32 flex-shrink-0 rounded-full" src="/images/fuji.png" alt="" />
-            
-              <span className="block text-sm font-semibold text-gray-700">Avalanche Fuji</span>
-              <span className="block text-sm font-semibold text-gray-700 ">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
-</span>
-
-          
-        
-            
-          </div>
-
-
-          <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center">
-        <img className="mx-auto h-32 w-32 flex-shrink-0 rounded-full" src="/images/sepolia.webp" alt="" />
-            
-              <span className="block text-sm font-semibold text-gray-700">Ethereum</span>
-              <span className="block text-sm font-semibold text-gray-700">0xc74574c03E649C793bC08e5b40d7775840Ee4A9D
-</span>
-
-          
-        
-            
-          </div>
-          
-        
+     
 
 
           <div className="bg-white p-4 rounded-md shadow-lg flex flex-col items-center col-span-2">
@@ -484,15 +495,12 @@ setShow(false);
               <select id="to"          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
 >
             <option value="">Select</option>
-            <option value="Polygon Amoy">
-              Polygon Amoy
-              <img src="/images/amoy.png" alt="Polygon Amoy Logo" className="w-6 h-6 inline-block ml-2" />
-            </option>
-            <option value="Sepolia">
+           
+            <option value="11155111">
                Sepolia
               <img src="/images/sepolia.webp" alt="ZkSync Sepolia Logo" className="w-6 h-6 inline-block ml-2" />
             </option>
-            <option value="Fuji">
+            <option value="43113">
               Fuji
               <img src="/images/fuji.png" alt="Fuji Logo" className="w-6 h-6 inline-block ml-2" />
             </option>
