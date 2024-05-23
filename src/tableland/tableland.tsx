@@ -29,7 +29,7 @@ export const alterTable = async() =>{
 
 export const queryInvestor = async(id:string)=>{
     try{
-    const { results } = await db.prepare(`SELECT * FROM ${investorsTable} where id='${id} ;`).all();
+    const { results } = await db.prepare(`SELECT * FROM ${investorsTable} where id='${id}' ;`).all();
 
    return results;
 }
@@ -68,7 +68,7 @@ catch(error:any)
 
 export const queryToken = async(id:string)=>{
     try{
-    const { results } = await db.prepare(`SELECT * FROM ${tokensTable} where id='${id} ;`).all();
+    const { results } = await db.prepare(`SELECT * FROM ${tokensTable} where id='${id}' ;`).all();
 
    return results;
 }
@@ -94,7 +94,7 @@ catch(error:any)
 export const insertInvestor =async (id:string,firstname:string,lastname:string,email:string,country:string,state:string,city:string,street:string,zip:string) => {
     // Insert a row into the table
 const { meta: insert } = await db
-.prepare(`INSERT INTO ${investorsTable} (id, firstname,lastname,email,country,state,city,street,zip) VALUES ( ?,?,?,?,?,?,?,?,?);`)
+.prepare(`INSERT INTO ${investorsTable} (id, firstname,lastname,email,country,state,city,street,zip,kyc) VALUES ( ?,?,?,?,?,?,?,?,?,0);`)
 .bind(id, firstname,lastname,email,country,state,city,street,zip)
 .run();
 
@@ -106,7 +106,7 @@ await insert.txn?.wait();
 export const kycApproved =async (id:string) => {
     // Insert a row into the table
 const { meta: insert } = await db
-.prepare(`Update ${investorsTable}  set kyc=0 where id=?;`)
+.prepare(`Update ${investorsTable}  set kyc=1 where id=?;`)
 .bind(id)
 .run();
 

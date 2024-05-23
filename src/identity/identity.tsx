@@ -29,6 +29,7 @@ export const createIdentity = async (signer:any)=>{
 export const getIdentity =async(signer:any,address:any)=>{
   
   const factory = new ethers.Contract(factoryAddress,OnChainId.contracts.Factory.abi,signer)
+  
   const id = await factory.getIdentity(address)
   return id;
   
@@ -187,7 +188,7 @@ export const addTrustedIssuer = async(signer:any)=>{
 
 export const addClaimIssuerKey = async(signer:any)=>{
   const issuer = new ethers.Contract(claimsIssuer,OnChainId.contracts.ClaimIssuer.abi,signer)
-  await issuer.addKey(IdentitySDK.utils.encodeAndHash(['address'], [await signer.getAddress()]), IdentitySDK.utils.enums.KeyPurpose.CLAIM, IdentitySDK.utils.enums.KeyType.ECDSA,{signer});
+  await issuer.addKey(IdentitySDK.utils.encodeAndHash(['address'], [await signer.getAddress()]), IdentitySDK.utils.enums.KeyPurpose.CLAIM, IdentitySDK.utils.enums.KeyType.ECDSA);
  
 }
 

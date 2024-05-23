@@ -7,16 +7,22 @@ import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { useState,useEffect } from 'react';
-import { Country, State, City }  from 'country-state-city';
+import { queryInvestors } from '@/tableland/tableland';
 import * as icountry from "iso-3166-1"
-const people = [
-    { name: 'Lindsay Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 0 },
-    { name: 'Linda Walton', title: 'Front-end Developer', email: 'lindsay.walton@example.com', status: 1 }
-    // More people...
-  ]
+
 export default function Investors() {
   const signer = useEthersSigner()
-  
+  const [investors,setInvestors] = useState([])
+  useEffect(()=>{
+    async function getInvestors(){
+      const _investors = await queryInvestors()
+      setInvestors(_investors)
+      console.log(icountry.whereAlpha2("TT")?.country)
+
+    } 
+    getInvestors()
+},[]
+)
   
   return (
     <>
@@ -88,21 +94,21 @@ export default function Investors() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {people.map((person) => (
-                    <tr key={person.email}>
+                  {investors.map((person) => (
+                    <tr key={person.id}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
-                        {person.name}
+                        {person.firstname} {person.lastname}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.title}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{icountry.whereAlpha2(person.country)?.country}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{person.email}</td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-center text-sm font-medium sm:pr-6">
-                      <span className={person.status == 0?`inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20`:`inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20`}>
-                        {person.status ==0 ? "Unverified":"Verified"}
+                      <span className={person.kyc == 0?`inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/20`:`inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20`}>
+                        {person.kyc ==0 ? "Unverified":"Verified"}
                       </span>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       <a
-          href='/investor'
+          href={`/investor/${person.id}`}
           className="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
         >
           view

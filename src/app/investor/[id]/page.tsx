@@ -11,13 +11,8 @@ import {  State, City }  from 'country-state-city';
 import * as icountry from "iso-3166-1"
 import { queryInvestor } from '@/tableland/tableland';
 import Notification from '@/components/Notification/Notification';
-import { getIdentity } from '@/identity/identity';
-import { useAccount} from 'wagmi'
-
-export default function InvestorProfile() {
+export default function InvestorProfile({params}) {
   const signer = useEthersSigner()
-  const account = useAccount()
-
   const [country,setCountry] = useState()
   const [countries,setCountries] = useState([])
   const [state,setState] = useState()
@@ -26,7 +21,26 @@ export default function InvestorProfile() {
   const [cities,setCities] = useState([])
   const [investorFound,setInvestorFound] = useState(false)
   const [investor,setInvestor] = useState()
+  const countryChanged = (event:any)=>{
+    const _states = State.getStatesOfCountry(event.target.value)
+    
+     setStates(_states)
+     setCountry(event.target.value)
+   } 
+
  
+const stateChanged = (event:any)=>{
+ const _cities = City.getCitiesOfState(country,event.target.value)
+ console.log(event.target.value)
+ console.log(_cities)
+  setCities(_cities)
+  setState(event.target.value)
+}   
+
+const cityChanged = (event:any)=>{
+  setCity(event.target.value) 
+}
+
 useEffect(()=>{
     //setCountries(Country.getAllCountries())
     //console.log( Country.getAllCountries())
@@ -34,10 +48,8 @@ useEffect(()=>{
      
 
      async function getInvestor(){
-      console.log(account.address)
-      let id = await getIdentity(signer,account.address)
-      console.log(id)
-        const _investor = await queryInvestor(id)
+        console.log(params.id)
+         const _investor = await queryInvestor(params.id)
          if(_investor.length > 0)
          {
             console.log(_investor)
@@ -58,10 +70,9 @@ useEffect(()=>{
             return
          }
      }
-      
-     if(account?.address && signer)
+
      getInvestor()
-},[account?.address,signer])
+},[])
 
 // NOTIFICATIONS functions
 const [notificationTitle, setNotificationTitle] = useState();
@@ -113,8 +124,8 @@ setShow(false);
         <div className="border-b border-gray-900/10 pb-12">
         <h1 className="text-base font-semibold text-4xl text-gray-900 mb-10">View Investor Profile</h1>
   
-          <h2 className=" text-base font-semibold leading-7 text-gray-900">Investor Status</h2>
-          {investor &&<span className={investor?.kyc == 0?`mt-4 inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-3xl font-medium text-red-700 ring-1 ring-inset ring-red-600/20`:`mt-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-3xl font-medium text-green-700 ring-1 ring-inset ring-green-600/20`}>
+          <h2 className="text-base font-semibold leading-7 text-gray-900">Investor Status</h2>
+          {investor &&<span className={investor?.kyc == 0?`inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-3xl font-medium text-red-700 ring-1 ring-inset ring-red-600/20`:`inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-3xl font-medium text-green-700 ring-1 ring-inset ring-green-600/20`}>
                         {investor?.kyc ==0 ? "Unverified":"Verified"}
                       </span>}
 
@@ -273,7 +284,15 @@ setShow(false);
       
       </div>
 
+      <div className="mt-6 flex items-center justify-end gap-x-6">
       
+        <button
+          type="submit"
+          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+        >
+          Approve KYC
+        </button>
+      </div>
     </form>
 
        </div>

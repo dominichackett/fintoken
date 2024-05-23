@@ -8,9 +8,12 @@ import { createIdentity,getIdentity ,allowKYCClaim,approveKYC,getClaims,validate
 import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
 import { alterTable } from '@/tableland/tableland';
+import { useAccount} from 'wagmi'
 
 export default function Home() {
   const signer = useEthersSigner()
+  const account = useAccount()
+
 const _createIdentity = async()=>{
    //console.log(signer?.)
    try {
@@ -30,7 +33,7 @@ const _getIdentity = async()=>{
 
       //console.log(signer?.provider)  
       //console.log(signer?.getAddress())
-      console.log( await getIdentity(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26"))
+      console.log( await getIdentity(signer,account.address))
 
   }catch(error:any){
     console.log(error)
@@ -115,7 +118,7 @@ const _isVerified= async()=>{
       //console.log(signer?.provider)  
       //console.log(signer?.getAddress())
      // console.log( await getClaims(signer,101010003000021))
-      console.log( await isVerified(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26"))
+      console.log( await isVerified(signer,account.address))
 
   }catch(error:any){
     console.log(error)

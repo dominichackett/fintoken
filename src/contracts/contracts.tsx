@@ -1,6 +1,6 @@
 export const identityGateway = '0x540Bb4Cb0B404ba3535875192912c9786208AC79' 
 export const claimsIssuer = '0x9535C4c184bE5627FF077079215d1bcdfE9352e2';
-export const factoryAddress = "0xB418C454D6B87361168d98D7E0383EeCaFc64cC4"//'0x6bBE8A0843D76a4DfC35Da19095515741D3D8833';
+export const factoryAddress ='0x6bBE8A0843D76a4DfC35Da19095515741D3D8833';// "0xB418C454D6B87361168d98D7E0383EeCaFc64cC4"
 export const factoryABI = [
   {
     "inputs": [
