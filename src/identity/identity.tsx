@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { IdentitySDK } from '@onchain-id/identity-sdk';
 import * as OnChainId from "@onchain-id/solidity"
-import { factoryAddress,identityGateway ,claimsIssuer,identityRegistry,identityRegistryABI,identityRegistryStorage
+import { identityFactoryAddress,identityGateway,identityGatewayABI ,claimsIssuer,identityRegistry,identityRegistryABI,identityRegistryStorage
   ,identityRegistryStorageABI,claimTopicsRegistry,claimTopicsRegistryABI,trustedIssuersRegistry,trustedIssuersRegistryABI} from "@/contracts/contracts";
 import claimJSON from './claim.json'
 
@@ -15,6 +15,7 @@ const provider = new ethers.providers.JsonRpcProvider(
 const _signer = wallet.connect(provider);
 
 export const createIdentity = async (signer:any)=>{
+    
     const tx = await IdentitySDK.Identity.deployUsingGatewayForWallet({
         gateway: identityGateway,
         identityOwner: await signer.getAddress(),
@@ -28,9 +29,11 @@ export const createIdentity = async (signer:any)=>{
 
 export const getIdentity =async(signer:any,address:any)=>{
   
-  const factory = new ethers.Contract(factoryAddress,OnChainId.contracts.Factory.abi,signer)
+  //const idg = new ethers.Contract(identityGateway,identityGatewayABI,signer)
+  //console.log(await idg.idFactory());
+  const factory = new ethers.Contract(identityFactoryAddress,OnChainId.contracts.Factory.abi,signer)
   
-  const id = await factory.getIdentity(address)
+  const id = await factory.getIdentity(ethers.utils.getAddress(address))
   return id;
   
 }
@@ -57,7 +60,7 @@ export const approveKYC = async(signer:any,address:string)=>{
   console.log(id)
   const topic =1;
   const scheme =1;
-  let cdata =   ethers.utils.hexlify(ethers.utils.toUtf8Bytes('KYC'))
+  let cdata =  ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC')) //ethers.utils.hexlify(ethers.utils.toUtf8Bytes('KYC'))
 
   
  

@@ -11,7 +11,7 @@ import Notification from '@/components/Notification/Notification';
 import { useAccount} from 'wagmi'
 import { ethers } from 'ethers';
 import { uploadToIPFS } from '@/fleek/fleek';
-import { trexGateway,trexGatewayABI ,factoryAddress,factoryABI} from '@/contracts/contracts';
+import { trexGateway,trexGatewayABI ,trexfactoryAddress,trexfactoryABI} from '@/contracts/contracts';
 import { insertToken } from '@/tableland/tableland';
 import { generateSalt } from '../../../utils/utils';
 export default function CreateToken() {
@@ -102,9 +102,9 @@ const _createToken =async()=>{
   
 
  const contract = new ethers.Contract(trexGateway, trexGatewayABI, signer);
- const factory = new ethers.Contract(factoryAddress,factoryABI,signer)
- 
- 
+ const factory = new ethers.Contract(trexfactoryAddress,trexfactoryABI,signer)
+ //const tokenId = await factory.tokenDeployed(salt)
+ //await  insertToken(tokenId,name,symbol,decimals,instrument,owner,account.address,url);
  try{
     const tx= await contract.callStatic.deployTREXSuite({
     owner: owner,
@@ -113,15 +113,15 @@ const _createToken =async()=>{
     decimals: decimals,
     irs: ethers.constants.AddressZero,
     ONCHAINID: ethers.constants.AddressZero,
-    irAgents: [],
-    tokenAgents: [],
+    irAgents: [account.address],
+    tokenAgents: [account.address],
     complianceModules: [],
     complianceSettings: [],
   },
   {
-    claimTopics: [ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC'))],
+    claimTopics: [1],
     issuers: ["0x9535C4c184bE5627FF077079215d1bcdfE9352e2"],
-    issuerClaims: [[ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC'))]],
+    issuerClaims: [[1]],
   });
   const transaction = await contract.deployTREXSuite({
     owner: owner,
@@ -130,15 +130,15 @@ const _createToken =async()=>{
     decimals: decimals,
     irs: ethers.constants.AddressZero,
     ONCHAINID: ethers.constants.AddressZero,
-    irAgents: [],
-    tokenAgents: [],
+    irAgents: [account.address],
+    tokenAgents: [account.address],
     complianceModules: [],
     complianceSettings: [],
   },
   {
-    claimTopics: [ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC'))],
+    claimTopics: [1],
     issuers: ["0x9535C4c184bE5627FF077079215d1bcdfE9352e2"],
-    issuerClaims: [[ethers.utils.keccak256(ethers.utils.toUtf8Bytes('KYC'))]],
+    issuerClaims: [[1]],
   });
   await transaction.wait(); // Wait for the transaction to be mined
 

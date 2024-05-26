@@ -59,7 +59,7 @@ const _approveKYC = async()=>{
 
       //console.log(signer?.provider)  
       //console.log(signer?.getAddress())
-      console.log( await approveKYC(signer,"0x654bA1c9809F16aFD9845B5ef86cd68b77DB4F26"))
+      console.log( await approveKYC(signer,"0x5858769800844ab75397775Ca2Fa87B270F7FbBe"))
 
   }catch(error:any){
     console.log(error)
