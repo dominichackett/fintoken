@@ -7,20 +7,113 @@ import Link from 'next/link'
 import { useEthersSigner } from '@/signer/signer'
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { useState,useEffect } from 'react';
+import Notification from '@/components/Notification/Notification';
+import { useAccount} from 'wagmi'
+import { bridgeAddress,bridgeABI,tokenABI } from '@/contracts/contracts';
+import { ethers } from 'ethers';
+import { text } from 'stream/consumers';
+
 export default function Bridge() {
   const signer = useEthersSigner()
-  const [fromBlockchain, setFromBlockchain] = useState('');
-  const [toBlockchain, setToBlockchain] = useState('');
-  const [amount, setAmount] = useState(0);
-  const [tokenAddress, setTokenAddress] = useState('');
-  const [recipient, setRecipient] = useState('');
+ 
   const [message, setMessage] = useState('');
+  const account = useAccount()
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // Call the function to transfer tokens using the provided data
-    // Display success or error message accordingly
-    setMessage('Tokens transferred successfully');
+  const [tokens,setTokens] = useState([{address:"0x48b7d62748641D93a335687C74Ce5Ba13BefB4F8",symbol:"TL",name:"Tobago Land"}])
+ // NOTIFICATIONS functions
+ const [notificationTitle, setNotificationTitle] = useState();
+ const [notificationDescription, setNotificationDescription] = useState();
+ const [dialogType, setDialogType] = useState(1);
+ const [show, setShow] = useState(false);
+ const close = async () => {
+setShow(false);
+};
+ 
+  function verifyChainId(chain:number,name:string)
+  {
+      if(account?.chainId != chain)
+      {
+ 
+       setDialogType(2) //Error
+       setNotificationTitle("Token");
+       setNotificationDescription(`Please select network ${name} id: ${chain}`)
+       setShow(true)
+       return false
+   
+      }
+      return true
+ 
+  }
+ 
+  const  bridgeToken = async () => {
+     const _to = document.getElementById("to").value 
+     const _from = document.getElementById("from")
+     const _amount = document.getElementById("amount").value 
+     const _token = document.getElementById("token").value
+
+
+     const selectedIndex = _from.selectedIndex;
+     const selectedOption = _from.options[selectedIndex];
+     const selectedText = selectedOption.text;
+     console.log(selectedOption)
+     console.log(_from.value)
+     
+     if(!verifyChainId(_from.value,selectedText))
+       return 
+      if(_from.value == _to)
+      {
+        setDialogType(2) //Error
+        setNotificationTitle("Token");
+        setNotificationDescription(`Error can't bridge token to the same chain`)
+        setShow(true)
+        return false
+     
+      }
+
+      if(!_token)
+      {
+        setDialogType(2) //Error
+        setNotificationTitle("Token");
+        setNotificationDescription(`Token not selected`)
+        setShow(true)
+        return false
+     
+      }
+
+
+      if(!_amount || _amount ==0)
+      {
+        setDialogType(2) //Error
+        setNotificationTitle("Token");
+        setNotificationDescription(`Token amount not entered.`)
+        setShow(true)
+        return false
+     
+      }
+
+      const bridgeContract = new ethers.Contract(bridgeAddress.get(account.chanId),bridgeABI,signer)
+      const tokenContract = new ethers.Contract(_token,tokenABI,signer)
+      try {
+
+             const tx =  tokenContract.callStatic.approve(bridgeAddress.get(account.chainId),_amount)
+             const tx1 =  tokenContract.approve(bridgeAddress.get(account.chainId),_amount) 
+             await tx1.wait()
+             const tx2= bridgeContract.callStatic.bridgeTokens(_token,_amount,_to)
+             const tx3 = bridgeContract.bridgeTokens(_token,_amount,_to)
+             await tx3.wait()
+             setDialogType(1) //Success
+             setNotificationTitle("Token");
+             setNotificationDescription(`Tokens bridged.`)
+             setShow(true)
+      }catch(error)
+      {
+        setDialogType(2) //Error
+        setNotificationTitle("Token");
+        setNotificationDescription(error?.error?.data?.message ? error?.error?.data?.message: error.message )
+        setShow(true)
+        return
+      }
+    
   };
   return (
     <>
@@ -78,18 +171,18 @@ export default function Bridge() {
                 From
               </label>
               <div className="mt-2">
-          <select id="from" value={fromBlockchain} onChange={(e) => setFromBlockchain(e.target.value)}         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+          <select id="from"          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
 >
             <option value="">Select</option>
-            <option value="Polygon Amoy">
+            <option value="80002">
               Polygon Amoy
               <img src="/polygon-amoy-logo.png" alt="Polygon Amoy Logo" className="w-6 h-6 inline-block ml-2" />
             </option>
-            <option value="Sepolia">
+            <option value="11155111">
               Sepolia
               <img src="/zksync-sepolia-logo.png" alt="ZkSync Sepolia Logo" className="w-6 h-6 inline-block ml-2" />
             </option>
-            <option value="Fuji">
+            <option value="43113">
               Fuji
               <img src="/avalanche.svg" alt="Fuji Logo" className="w-6 h-6 inline-block ml-2" />
             </option>
@@ -104,22 +197,22 @@ export default function Bridge() {
               </label>
               <div className="mt-2">
               
-          <select id="to" value={toBlockchain} onChange={(e) => setToBlockchain(e.target.value)}         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+          <select id="to"          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
 >
-            <option value="">Select</option>
-            <option value="Polygon Amoy">
+<option value="">Select</option>
+            <option value="80002">
               Polygon Amoy
               <img src="/polygon-amoy-logo.png" alt="Polygon Amoy Logo" className="w-6 h-6 inline-block ml-2" />
             </option>
-            <option value="Sepolia">
-               Sepolia
+            <option value="11155111">
+              Sepolia
               <img src="/zksync-sepolia-logo.png" alt="ZkSync Sepolia Logo" className="w-6 h-6 inline-block ml-2" />
             </option>
-            <option value="Fuji">
+            <option value="43113">
               Fuji
-              <img src="/fuji-logo.png" alt="Fuji Logo" className="w-6 h-6 inline-block ml-2" />
+              <img src="/avalanche.svg" alt="Fuji Logo" className="w-6 h-6 inline-block ml-2" />
             </option>
-            
+           
           </select>
         
 
@@ -132,25 +225,15 @@ export default function Bridge() {
                 Token
               </label>
               <div className="mt-2">
-          <select id="token" value={fromBlockchain} onChange={(e) => setFromBlockchain(e.target.value)}         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+          <select id="token"        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
 >
             <option value="">Select</option>
-            <option value="Polygon Amoy">
-              Polygon Amoy
-              <img src="/polygon-amoy-logo.png" alt="Polygon Amoy Logo" className="w-6 h-6 inline-block ml-2" />
+            {tokens.map((token) =>(
+                  <option key={token.address} value={token.address}>
+                  {token.symbol} {token.name}  {token.address} 
             </option>
-            <option value="ZkSync Sepolia">
-              ZkSync Sepolia
-              <img src="/zksync-sepolia-logo.png" alt="ZkSync Sepolia Logo" className="w-6 h-6 inline-block ml-2" />
-            </option>
-            <option value="Fuji">
-              Fuji
-              <img src="/fuji-logo.png" alt="Fuji Logo" className="w-6 h-6 inline-block ml-2" />
-            </option>
-            <option value="Scroll Sepolia">
-              Scroll Sepolia
-              <img src="/scroll-sepolia-logo.png" alt="Scroll Sepolia Logo" className="w-6 h-6 inline-block ml-2" />
-            </option>
+
+          ))}
           </select>
         
               </div>
@@ -162,7 +245,7 @@ export default function Bridge() {
                 Amount
               </label>
               <div className="mt-2">
-              <input type="number" id="amount" value={amount} onChange={(e) => setAmount(parseFloat(e.target.value))}                   className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              <input type="number" id="amount" min={0}                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                   />
    
         
@@ -175,8 +258,9 @@ export default function Bridge() {
       <div className="mt-6 flex items-center justify-end gap-x-6">
       
         <button
-          type="submit"
+          type="button"
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+         onClick={()=>bridgeToken()}
         >
           Bridge Tokens
         </button>
@@ -190,6 +274,13 @@ export default function Bridge() {
       
     </section>
     <Footer />
+    <Notification
+        type={dialogType}
+        show={show}
+        close={close}
+        title={notificationTitle}
+        description={notificationDescription}
+      />
      </main>
      </>
   )

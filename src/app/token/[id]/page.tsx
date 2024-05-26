@@ -13,8 +13,8 @@ import { useState,useEffect } from 'react';
 import * as icountry from "iso-3166-1"
 import Notification from '@/components/Notification/Notification';
 import numeral from 'numeral';
-import { tokenABI,ModularComplianceABI, ModularComplianceBytecode, CountryRestrictModuleABI,CountryRestrictModule,ModuleProxyABI,ModuleProxyBytecode
-  , CountryRestrictModuleBytecode,identityRegistryABI,identityGateway,identityGatewayABI} from '@/contracts/contracts';
+import { tokenABI,ModularComplianceABI, CountryRestrictModuleABI,CountryRestrictModule,ModuleProxyABI,ModuleProxyBytecode
+  ,identityRegistryABI,bridgeAddress,bridgeABI} from '@/contracts/contracts';
 import { ethers } from 'ethers';
 import { getIdentity,registerIdentity } from '@/identity/identity';
 import { verify } from 'crypto';
@@ -676,6 +676,45 @@ setShow(false);
     return null; // Render nothing on the server
   }
   
+  const deployToChain = async()=>{
+    if(!verifyChainId(80002,"Polygon Amoy"))
+    return
+
+    const _blockchain  = document.getElementById("blockChain")?.value 
+    if(!_blockchain)
+    {
+      setDialogType(2) //Error
+      setNotificationTitle("Token");
+      setNotificationDescription("Please select a blockchain." )
+      setShow(true)
+      return
+
+    }
+     
+    try{
+
+      const contract = new ethers.Contract(bridgeAddress.get(account.chainId),bridgeABI,signer)
+      const stx = await contract.callStatic.deployToChain(_blockchain,params.id)
+      const tx = await contract.deployToChain(_blockchain,params.id)
+
+      await tx.wait() 
+      setDialogType(1) //Success
+      setNotificationTitle("Token");
+      setNotificationDescription("Token deployed to chain.")
+      setShow(true)
+      setRefreshData(new Date().getTime())
+
+    }catch(error)
+    {
+      setDialogType(2) //Error
+      setNotificationTitle("Token");
+      setNotificationDescription(error?.error?.data?.message ? error?.error?.data?.message: error.message )
+      setShow(true)
+      return
+
+    }
+  
+  }
   return (
     <>
       <Head>
@@ -1116,7 +1155,7 @@ setShow(false);
               <div className="flex items-center">
               <span className="block text-lg text-green-500 mt-1 mr-2">Chain</span>
               
-              <select id="to"          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+              <select id="blockChain"          className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
 >
             <option value="">Select</option>
            
@@ -1130,7 +1169,9 @@ setShow(false);
             </option>
             
           </select>
-          <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 ml-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+          <button className="inline-flex items-center rounded-md bg-indigo-600 px-4 py-2 ml-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          type='button'
+          onClick={()=>deployToChain()}>
                   Register
                 </button>
              </div>
